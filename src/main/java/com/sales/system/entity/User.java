@@ -1,13 +1,12 @@
 package com.sales.system.entity;
 
-import jakarta.persistence.CascadeType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import jakarta.persistence.*;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 public class User extends BaseEntity {
 
@@ -20,7 +19,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
     private Cart cart;
+
+    @Embedded
+    private Address address;
 
 }

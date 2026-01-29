@@ -5,7 +5,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import javax.management.relation.Role;
 
 @Entity
 @Table(name = "user_roles")
@@ -17,5 +16,5 @@ public class UserRole extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private Role role;
+    private Roles role;
 }

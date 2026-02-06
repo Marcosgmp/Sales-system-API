@@ -4,10 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
+@Entity
+@Table(name = "users")
 public class User extends BaseEntity {
 
     @Column(nullable = false)
@@ -19,7 +19,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "cart_id", unique = true)
     private Cart cart;
 
     @Embedded
@@ -27,6 +28,8 @@ public class User extends BaseEntity {
 
     public void setCart(Cart cart) {
         this.cart = cart;
-        cart.setUser(this); // 🔥 garante os dois lados
+        if (cart != null) {
+            cart.setUser(this);
+        }
     }
 }

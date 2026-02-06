@@ -1,4 +1,4 @@
-package com.sales.system.controller.user;
+package com.sales.system.controller.auth;
 
 import com.sales.system.dto.user.UserRegisterRequestDTO;
 import com.sales.system.dto.user.UserResponseDTO;
@@ -8,18 +8,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
-public class UserController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> register(
+            @Valid @RequestBody UserRegisterRequestDTO dto
+    ) {
+        return ResponseEntity.ok(userService.register(dto));
     }
 }

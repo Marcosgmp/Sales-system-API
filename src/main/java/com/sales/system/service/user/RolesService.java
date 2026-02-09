@@ -1,4 +1,4 @@
-package com.sales.system.service;
+package com.sales.system.service.user;
 
 import com.sales.system.entity.Roles;
 import com.sales.system.repository.RolesRepository;
@@ -18,7 +18,7 @@ public class RolesService {
     }
 
     @Transactional
-    public Roles create(String name) {
+    public Roles createRole(String name) {
         return rolesRepository.findByName(name)
                 .orElseGet(() -> {
                     Roles role = new Roles();

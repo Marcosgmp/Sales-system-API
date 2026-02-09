@@ -1,7 +1,7 @@
 package com.sales.system.controller.admin;
 
 import com.sales.system.dto.user.UserResponseDTO;
-import com.sales.system.service.UserService;
+import com.sales.system.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

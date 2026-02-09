@@ -1,4 +1,4 @@
-package com.sales.system.service;
+package com.sales.system.service.cart;
 
 import com.sales.system.entity.CartItem;
 import com.sales.system.repository.CartItemRepository;

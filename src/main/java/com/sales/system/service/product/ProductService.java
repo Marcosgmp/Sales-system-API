@@ -1,4 +1,4 @@
-package com.sales.system.service;
+package com.sales.system.service.product;
 
 import com.sales.system.dto.admin.product.AdminProductCreateDTO;
 import com.sales.system.dto.product.ProductResponseDTO;
@@ -19,7 +19,6 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    //ADMIN
     @Transactional
     public ProductResponseDTO create(AdminProductCreateDTO dto) {
 

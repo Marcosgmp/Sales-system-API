@@ -2,7 +2,7 @@ package com.sales.system.controller.admin;
 
 import com.sales.system.dto.admin.product.AdminProductCreateDTO;
 import com.sales.system.dto.product.ProductResponseDTO;
-import com.sales.system.service.ProductService;
+import com.sales.system.service.product.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

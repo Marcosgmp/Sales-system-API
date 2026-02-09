@@ -1,4 +1,4 @@
-package com.sales.system.service;
+package com.sales.system.service.cart;
 
 import com.sales.system.dto.cart.CartItemResponseDTO;
 import com.sales.system.dto.cart.CartResponseDTO;
@@ -25,47 +25,75 @@ public class CartService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public CartService(CartRepository cartRepository,
-                       CartItemRepository cartItemRepository,
-                       ProductRepository productRepository,
-                       UserRepository userRepository) {
+    public CartService(
+            CartRepository cartRepository,
+            CartItemRepository cartItemRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository
+    ) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
     }
 
-    public CartResponseDTO getCartResponse(Long userId) {
-        Cart cart = getCart(userId);
+
+    public CartResponseDTO getCartResponse(String email) {
+        Cart cart = getCartByEmail(email);
         return mapToDTO(cart);
     }
 
     @Transactional
-    public CartResponseDTO addItem(Long userId, Long productId, int quantity) {
-        addItemRaw(userId, productId, quantity);
-        return getCartResponse(userId);
+    public CartResponseDTO addItem(String email, Long productId, int quantity) {
+        Cart cart = getCartByEmail(email);
+        addItemRaw(cart, productId, quantity);
+        return mapToDTO(cart);
     }
 
     @Transactional
-    public CartResponseDTO updateQuantity(Long userId, Long productId, int quantity) {
-        updateQuantityRaw(userId, productId, quantity);
-        return getCartResponse(userId);
+    public CartResponseDTO updateQuantity(String email, Long productId, int quantity) {
+        Cart cart = getCartByEmail(email);
+        updateQuantityRaw(cart, productId, quantity);
+        return mapToDTO(cart);
     }
 
     @Transactional
-    public CartResponseDTO removeItem(Long userId, Long productId) {
-        updateQuantityRaw(userId, productId, 0);
-        return getCartResponse(userId);
+    public CartResponseDTO removeItem(String email, Long productId) {
+        Cart cart = getCartByEmail(email);
+        updateQuantityRaw(cart, productId, 0);
+        return mapToDTO(cart);
     }
 
-    private void addItemRaw(Long userId, Long productId, int quantity) {
-        Cart cart = getCart(userId);
+    public BigDecimal getTotal(String email) {
+        return getCartResponse(email).getTotal();
+    }
+
+    @Transactional
+    public void clearCart(String email) {
+        Cart cart = getCartByEmail(email);
+        cart.getItems().forEach(cartItemRepository::delete);
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+
+    private Cart getCartByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getCart() == null) {
+            throw new IllegalStateException("Cart not initialized");
+        }
+        return user.getCart();
+    }
+
+    private void addItemRaw(Cart cart, Long productId, int quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProduct().getId().equals(productId))
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
 
         if (item == null) {
             item = new CartItem();
@@ -80,9 +108,7 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    private void updateQuantityRaw(Long userId, Long productId, int quantity) {
-        Cart cart = getCart(userId);
-
+    private void updateQuantityRaw(Cart cart, Long productId, int quantity) {
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProduct().getId().equals(productId))
                 .findFirst()
@@ -98,16 +124,6 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    private Cart getCart(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (user.getCart() == null) {
-            throw new IllegalStateException("Cart not initialized for user");
-        }
-        return user.getCart();
-    }
-
     private CartResponseDTO mapToDTO(Cart cart) {
         CartResponseDTO dto = new CartResponseDTO();
         dto.setCartId(cart.getId());
@@ -119,29 +135,20 @@ public class CartService {
             itemDto.setProductName(item.getProduct().getName());
             itemDto.setUnitPrice(item.getProduct().getPrice());
             itemDto.setQuantity(item.getQuantity());
-            itemDto.setSubtotal(item.getProduct().getPrice()
-                    .multiply(BigDecimal.valueOf(item.getQuantity())));
+            itemDto.setSubtotal(
+                    item.getProduct().getPrice()
+                            .multiply(BigDecimal.valueOf(item.getQuantity()))
+            );
             return itemDto;
         }).toList();
 
         dto.setItems(items);
-        dto.setTotal(items.stream()
-                .map(CartItemResponseDTO::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        dto.setTotal(
+                items.stream()
+                        .map(CartItemResponseDTO::getSubtotal)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
         return dto;
-    }
-
-    public BigDecimal getTotal(Long userId) {
-        CartResponseDTO cartDTO = getCartResponse(userId);
-        return cartDTO.getTotal();
-    }
-
-    @Transactional
-    public void clearCart(Long userId) {
-        Cart cart = getCart(userId);
-        cart.getItems().forEach(cartItemRepository::delete);
-        cart.getItems().clear();
-        cartRepository.save(cart);
     }
 }

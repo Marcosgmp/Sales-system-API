@@ -2,7 +2,7 @@ package com.sales.system.controller.admin;
 
 import com.sales.system.dto.admin.cart.AdminCartItemUpdateDTO;
 import com.sales.system.entity.CartItem;
-import com.sales.system.service.CartItemService;
+import com.sales.system.service.cart.CartItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

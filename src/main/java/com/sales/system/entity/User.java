@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -25,6 +28,9 @@ public class User extends BaseEntity {
 
     @Embedded
     private Address address;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public void setCart(Cart cart) {
         this.cart = cart;

@@ -1,14 +1,15 @@
 package com.sales.system.controller.admin;
 
 import com.sales.system.entity.Roles;
-import com.sales.system.service.RolesService;
+import com.sales.system.service.user.RolesService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/roles")
+@RequestMapping("/api/admin/roles")
 public class AdminRolesController {
 
     private final RolesService rolesService;
@@ -18,12 +19,13 @@ public class AdminRolesController {
     }
 
     @PostMapping
-    public ResponseEntity<Roles> create(@RequestParam String name) {
-        return ResponseEntity.ok(rolesService.create(name));
+    public ResponseEntity<Roles> createRole(@RequestBody Roles role) {
+        Roles savedRole = rolesService.createRole(role.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
     }
 
     @GetMapping
-    public ResponseEntity<List<Roles>> listAll() {
+    public ResponseEntity<List<Roles>> listAllRoles() {
         return ResponseEntity.ok(rolesService.listAll());
     }
 }

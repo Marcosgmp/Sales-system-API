@@ -1,10 +1,11 @@
-package com.sales.system.service;
+package com.sales.system.service.user;
 
 import com.sales.system.dto.user.UserRegisterRequestDTO;
 import com.sales.system.dto.user.UserResponseDTO;
 import com.sales.system.entity.Cart;
 import com.sales.system.entity.User;
 import com.sales.system.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +16,13 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-
 
     @Transactional
     public UserResponseDTO register(UserRegisterRequestDTO dto) {
@@ -30,7 +33,8 @@ public class UserService {
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         Cart cart = new Cart();
         user.setCart(cart);
@@ -38,7 +42,6 @@ public class UserService {
         User savedUser = userRepository.save(user);
         return mapToDTO(savedUser);
     }
-
 
     public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id)
@@ -60,6 +63,18 @@ public class UserService {
     }
 
     private UserResponseDTO mapToDTO(User user) {
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCart() != null ? user.getCart().getId() : null
+        );
+    }
+
+    public UserResponseDTO findByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         return new UserResponseDTO(
                 user.getId(),
                 user.getName(),

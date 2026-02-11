@@ -4,6 +4,8 @@ import com.sales.system.dto.cart.AddItemRequest;
 import com.sales.system.dto.cart.CartResponseDTO;
 import com.sales.system.dto.user.UpdateItemRequest;
 import com.sales.system.service.cart.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+@Tag(
+        name = "Cart",
+        description = "Operações do carrinho do usuário autenticado"
+)
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
@@ -21,6 +27,10 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @Operation(
+            summary = "Visualizar carrinho",
+            description = "Retorna o carrinho do usuário autenticado"
+    )
     @GetMapping
     public ResponseEntity<CartResponseDTO> getCart(Authentication authentication) {
         return ResponseEntity.ok(
@@ -28,6 +38,10 @@ public class CartController {
         );
     }
 
+    @Operation(
+            summary = "Adicionar item ao carrinho",
+            description = "Adiciona um produto ao carrinho do usuário autenticado"
+    )
     @PostMapping("/items")
     public ResponseEntity<CartResponseDTO> addItem(
             Authentication authentication,
@@ -42,6 +56,10 @@ public class CartController {
         );
     }
 
+    @Operation(
+            summary = "Atualizar item do carrinho",
+            description = "Atualiza a quantidade de um produto no carrinho"
+    )
     @PutMapping("/items")
     public ResponseEntity<CartResponseDTO> updateItem(
             Authentication authentication,
@@ -56,6 +74,10 @@ public class CartController {
         );
     }
 
+    @Operation(
+            summary = "Remover item do carrinho",
+            description = "Remove um produto do carrinho"
+    )
     @DeleteMapping("/items/{productId}")
     public ResponseEntity<CartResponseDTO> removeItem(
             Authentication authentication,
@@ -66,6 +88,10 @@ public class CartController {
         );
     }
 
+    @Operation(
+            summary = "Total do carrinho",
+            description = "Retorna o valor total do carrinho"
+    )
     @GetMapping("/total")
     public ResponseEntity<BigDecimal> getTotal(Authentication authentication) {
         return ResponseEntity.ok(
@@ -73,6 +99,10 @@ public class CartController {
         );
     }
 
+    @Operation(
+            summary = "Limpar carrinho",
+            description = "Remove todos os itens do carrinho"
+    )
     @DeleteMapping
     public ResponseEntity<Void> clearCart(Authentication authentication) {
         cartService.clearCart(authentication.getName());

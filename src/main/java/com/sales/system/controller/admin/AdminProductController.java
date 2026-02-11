@@ -3,10 +3,18 @@ package com.sales.system.controller.admin;
 import com.sales.system.dto.admin.product.AdminProductCreateDTO;
 import com.sales.system.dto.product.ProductResponseDTO;
 import com.sales.system.service.product.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+        name = "Admin - Products",
+        description = "Gerenciamento administrativo de produtos"
+)
 @RestController
 @RequestMapping("/api/admin/products")
 public class AdminProductController {
@@ -17,6 +25,15 @@ public class AdminProductController {
         this.productService = productService;
     }
 
+    @Operation(
+            summary = "Criar produto",
+            description = "Cria um novo produto no sistema (ADMIN)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Produto criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @PostMapping
     public ResponseEntity<ProductResponseDTO> create(
             @Valid @RequestBody AdminProductCreateDTO dto
@@ -24,6 +41,15 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.create(dto));
     }
 
+    @Operation(
+            summary = "Atualizar produto",
+            description = "Atualiza os dados de um produto existente (ADMIN)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> update(
             @PathVariable Long id,
@@ -32,6 +58,15 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 
+    @Operation(
+            summary = "Excluir produto",
+            description = "Remove um produto do sistema pelo ID (ADMIN)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Produto removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
